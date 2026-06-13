@@ -1,0 +1,135 @@
+# ============================================================
+# Efficient Hybrid Anatomy-Aware SC-ViT — Default Configuration
+# MacBook M3 Pro (Apple Silicon MPS) — Optimized
+# ============================================================
+
+# ----- Dataset -----
+data:
+  dataset_dir: "/Users/akashpaluvai/.cache/kagglehub/datasets/ashery/chexpert/versions/1"
+  train_csv: "train.csv"
+  valid_csv: "valid.csv"
+
+  # Image size reduced from 224→192 for MPS efficiency
+  # 192/16 = 12 → 12×12 = 144 patches (down from 196)
+  image_size: 192
+  patch_size: 16
+
+  num_classes: 5
+  target_columns:
+    - "Atelectasis"
+    - "Cardiomegaly"
+    - "Consolidation"
+    - "Edema"
+    - "Pleural Effusion"
+
+  uncertainty_policy: "ones"   # ones | zeros | ignore
+  frontal_only: false
+
+  # Subset sizes for lightweight M3 Pro experimentation
+  subset_train: 12000          # training images (full: ~200k)
+  subset_val: 1500             # validation images (full: ~234)
+
+# ----- Model -----
+model:
+  # ViT-Small (384-dim, 6 heads, 12 blocks) — 3× smaller than ViT-Base
+  # Options: vit_tiny_patch16_224 | vit_small_patch16_224 | vit_base_patch16_224
+  name: "vit_small_patch16_224"
+  patch_size: 16
+  embed_dim: 384         # 384 for small, 192 for tiny, 768 for base
+  depth: 12
+  num_heads: 6           # 6 for small, 3 for tiny, 12 for base
+  mlp_ratio: 4.0
+  dropout: 0.1
+  attention_dropout: 0.0
+  use_pretrained: true
+
+# ----- Structure Discovery -----
+structure:
+  # Feature extractor for DINO-based feasibility matrix
+  feature_extractor: "dino"
+  # dino_vits16 = ViT-S/16, 384-dim — faster on M3 than vitb16
+  dino_model: "dino_vits16"
+
+  # Graph construction
+  k_neighbors: 8                # k-NN graph parameter
+  n_clusters: 9                 # clusters for 12×12 grid (was 16 for 14×14)
+  num_samples_for_graph: 500    # images used to build population graph
+
+  # Feasibility matrix config
+  intra_cluster_weight: 1.0
+  inter_cluster_weight: 0.3
+  masking_mode: "soft"          # soft | hard
+
+  # Whether to use each prior type
+  use_feature_prior: true
+  use_anatomy_prior: true
+  use_hybrid_prior: true
+
+  # Hybrid blend ratio: F_hybrid = alpha * F_anatomy + (1-alpha) * F_feature
+  alpha: 0.7
+
+  # Soft structural bias strength (learnable, initialized here)
+  lambda_init: 0.1
+  soft_constraint: true         # true = additive log-bias; false = multiplicative mask
+
+  # Cache directory for precomputed matrices
+  cache_dir: "outputs/cache"
+
+# ----- Anatomy Prior -----
+anatomy:
+  num_regions: 7               # 7 anatomical regions on 12×12 grid
+  # Region interaction weights
+  same_region_weight: 1.0      # same anatomical region
+  adjacent_weight: 0.6         # adjacent regions (e.g., lung-heart)
+  distant_weight: 0.15         # distant regions (e.g., left-right lung)
+  background_weight: 0.05      # background-background interactions
+
+# ----- Training -----
+training:
+  batch_size: 8                # Small batch for M3 Pro MPS memory
+  num_workers: 0               # 0 for MPS stability (or 2 if stable)
+  epochs: 10
+  learning_rate: 1.0e-4
+  weight_decay: 1.0e-4
+  warmup_epochs: 2
+  scheduler: "cosine"          # cosine | step
+  gradient_clip: 1.0
+
+  # Gradient accumulation: effective batch = batch_size * grad_accum_steps = 16
+  grad_accum_steps: 2
+
+  # Backbone freezing for lightweight training
+  freeze_backbone: true
+  freeze_ratio: 0.7            # Freeze first 70% of transformer blocks
+
+  # Mixed precision: DISABLED for MPS (MPS AMP is unstable)
+  mixed_precision: false
+  use_amp: false
+
+# ----- System -----
+system:
+  use_mps: true                # Use Apple Silicon MPS backend
+  mixed_precision: false       # Never enable on MPS
+  pin_memory: false            # Must be false on MPS
+  compile_model: false         # torch.compile disabled (MPS incompatible)
+
+# ----- Logging & Checkpoints -----
+logging:
+  log_dir: "outputs/logs"
+  checkpoint_dir: "outputs/checkpoints"
+  save_every: 5                # save checkpoint every N epochs
+  log_interval: 50             # log every N steps
+
+# ----- Evaluation -----
+evaluation:
+  metrics:
+    - "auroc"
+    - "auprc"
+    - "f1"
+    - "attention_entropy"
+    - "attention_sparsity"
+    - "anatomical_attention_ratio"
+    - "noise_robustness"
+  visualize_attention: true
+  visualization_dir: "outputs/visualizations"
+  results_dir: "outputs/results"

@@ -1,0 +1,16 @@
+[tool.pyrefly]
+python_interpreter = ".venv/bin/python"
+project_excludes = [
+    ".venv",
+    "outputs",
+    "__pycache__",
+]
+
+[tool.pyright]
+pythonPath = ".venv/bin/python"
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.10"
+typeCheckingMode = "off"
+reportMissingModuleSource = "none"
+reportMissingImports = "none"

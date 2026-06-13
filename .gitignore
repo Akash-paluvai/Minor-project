@@ -1,0 +1,75 @@
+# ============================================================
+# .gitignore — Structure-Constrained ViT for Medical Imaging
+# ============================================================
+
+# ----- Python -----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# ----- Virtual Environments -----
+.venv/
+venv/
+env/
+ENV/
+
+# ----- Model Outputs & Artifacts -----
+outputs/
+*.pt
+*.pth
+*.pkl
+*.npy
+*.npz
+*.h5
+*.hdf5
+*.onnx
+
+# ----- Datasets -----
+/data/
+/datasets/
+*.csv
+!requirements.txt
+
+# ----- Logs & Caches -----
+*.log
+*.cache
+.cache/
+logs/
+*.tfevents*
+runs/
+
+# ----- TensorBoard -----
+events.out.tfevents.*
+
+# ----- Jupyter -----
+.ipynb_checkpoints/
+*.ipynb
+
+# ----- IDE / Editor -----
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ----- macOS -----
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ----- Archives / Compressed -----
+*.zip
+*.tar.gz
+*.tar
+*.gz
+*.rar
+
+# ----- Images (generated outputs) -----
+# Note: only ignoring in outputs/ (already covered above)
+# Project documentation images can be committed manually if needed
+
+# ----- Miscellaneous -----
+*.resolved
+pyrightconfig.json
