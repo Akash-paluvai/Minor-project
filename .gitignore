@@ -14,22 +14,36 @@ venv/
 env/
 ENV/
 
-# ----- Model Outputs & Artifacts -----
-outputs/
+# ----- Heavy Model Checkpoints & Large Artifacts (Excluded from Git) -----
+**/checkpoints/
+outputs/checkpoints/
+outputs/embeddings/*.pt
+outputs/embeddings/dino_embeddings.pt
+outputs/outputs/
+outputs/logs/
+outputs/**/logs/
+
+# General model weights & binary dumps
 *.pt
 *.pth
 *.pkl
-*.npy
-*.npz
 *.h5
 *.hdf5
 *.onnx
+
+# Allow lightweight precomputed priors & results needed for web dashboard
+!outputs/cache/*.pt
+!outputs/results/*.pt
+!outputs/feasibility/*.pt
+!outputs/graph/*.pt
+!outputs/experiments/*.pt
 
 # ----- Datasets -----
 /data/
 /datasets/
 *.csv
 !requirements.txt
+!outputs/experiments/*.csv
 
 # ----- Logs & Caches -----
 *.log

@@ -54,6 +54,16 @@ python train_constrained.py --config configs/default.yaml
 python evaluate.py --config configs/default.yaml --visualize-attention
 ```
 
+### 5. Launch Web Research Dashboard
+```bash
+python gui_dashboard.py
+```
+Open `http://127.0.0.1:7860` in your browser to view:
+- **Experiment Results**: Model metrics table and comparison charts (AUROC, F1, Entropy, Noise Robustness)
+- **Visualization Gallery**: Browser for clustering, graph topology, feasibility matrices, and dataset samples
+- **Test on Images**: Multi-label pathology prediction and calibrated inference
+- **Architecture**: Heuristic anatomy priors and structural attention pipeline
+
 ## Project Structure
 
 ```

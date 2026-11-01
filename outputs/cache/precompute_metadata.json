@@ -1,0 +1,16 @@
+{
+  "img_size": 192,
+  "grid_size": 12,
+  "n_patches": 144,
+  "n_tokens": 145,
+  "alpha": 0.7,
+  "dry_run": true,
+  "n_images": 0,
+  "elapsed_sec": 0.6,
+  "files": {
+    "F_anatomy": "outputs/cache/F_anatomy.pt",
+    "F_feature": null,
+    "F_hybrid": "outputs/cache/F_hybrid.pt"
+  },
+  "anatomy_labels_path": "outputs/cache/F_anatomy.pt"
+}
